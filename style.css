@@ -622,32 +622,6 @@ input[type="file"]{
     border-bottom:2px solid rgba(212,175,55,.4);
 }
 
-/* ========================================= */
-/* MOBILE */
-/* ========================================= */
-
-@media(max-width:768px){
-
-    form{
-
-        padding:25px;
-    }
-
-    .form-grid{
-
-        grid-template-columns:1fr;
-    }
-
-    .complaint-section h2{
-
-        font-size:34px;
-    }
-
-    .submit-btn{
-
-        font-size:16px;
-    }
-}
 
 
 /* ========================================= /
@@ -777,44 +751,7 @@ border-top:3px solid gold;
 
 }
 
-/* ========================================= /
-/ MOBILE /
-/ ========================================= */
 
-@media(max-width:768px){
-
-.navbar{
-    flex-direction:column;
-    gap:15px;
-}
-
-.nav-links{
-    flex-wrap:wrap;
-    justify-content:center;
-}
-
-.hero-content h1{
-    font-size:38px;
-}
-
-.site-name{
-    font-size:18px;
-}
-
-.form-grid{
-    grid-template-columns:1fr;
-}
-
-.stats{
-    flex-direction:column;
-}
-
-.stats-box{
-    width:100%;
-    max-width:320px;
-}
-
-}
 
 
 /* ======================================= */
@@ -952,6 +889,205 @@ border-top:3px solid gold;
   }
   to {
     transform: scaleX(0);
+  }
+}
+
+/* ========================================= */
+/* RESPONSIVE DESIGN - BREAKPOINTS           */
+/* ========================================= */
+
+/* 1. TABLET BREAKPOINT (max-width: 992px) */
+@media (max-width: 992px) {
+  .hero-content h1 {
+    font-size: 46px;
+  }
+  .about-content h2,
+  .notice-header h2,
+  .complaint-section h2,
+  .testimonials h2,
+  .contact-content h2 {
+    font-size: 38px;
+  }
+}
+
+/* 2. MOBILE BREAKPOINT (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Navbar */
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 4%;
+  }
+  .nav-links {
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .site-name {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 80vh;
+    padding: 60px 4%;
+  }
+  .hero-content h1 {
+    font-size: 34px;
+    margin-bottom: 20px;
+  }
+  .hero-content p {
+    font-size: 18px;
+    margin-bottom: 25px;
+  }
+  .hero-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+  }
+
+  /* Stats Section */
+  .stats {
+    padding: 60px 5%;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .stats-box {
+    width: 100%;
+    max-width: 320px;
+    height: 150px;
+  }
+  .stats-box h2 {
+    font-size: 42px;
+  }
+
+  /* About Section */
+  .about-section {
+    padding: 60px 5%;
+  }
+  .about-content {
+    padding: 30px 20px;
+    border-left-width: 4px;
+  }
+  .about-content h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+  .about-content p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  /* Notice Section */
+  .notice-section {
+    padding: 60px 5%;
+  }
+  .notice-header {
+    margin-bottom: 40px;
+  }
+  .notice-header h2 {
+    font-size: 28px;
+  }
+  .notice-header p {
+    font-size: 16px;
+  }
+  .notice-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .notice-card {
+    padding: 25px 20px;
+  }
+
+  /* Complaint Form */
+  .complaint-section {
+    padding: 60px 5%;
+  }
+  .complaint-section h2 {
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+  .complaint-subtitle {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+  form {
+    padding: 25px 20px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .input-box input,
+  .input-box select,
+  .input-box textarea {
+    padding: 12px;
+    font-size: 14px;
+  }
+  .submit-btn {
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    padding: 60px 5%;
+  }
+  .testimonials h2 {
+    font-size: 28px;
+    margin-bottom: 40px;
+  }
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .testimonial-card {
+    padding: 25px 20px;
+  }
+
+  /* Contact & Footer */
+  .contact-section {
+    padding: 60px 5%;
+  }
+  .contact-content h2 {
+    font-size: 28px;
+  }
+  .contact-content p {
+    font-size: 16px;
+  }
+}
+
+/* 3. SMALL SMARTPHONES BREAKPOINT (max-width: 480px) */
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 26px;
+  }
+  .hero-content p {
+    font-size: 15px;
+  }
+  .about-content h2,
+  .notice-header h2,
+  .complaint-section h2,
+  .testimonials h2,
+  .contact-content h2 {
+    font-size: 24px;
+  }
+  .site-name {
+    font-size: 16px;
+  }
+  .nav-links {
+    gap: 12px;
+  }
+  .nav-links a {
+    font-size: 13px;
+  }
+  .agreement-box span {
+    font-size: 12px;
+  }
+  .toast {
+    min-width: auto;
+    width: calc(100vw - 40px);
   }
 }
 
