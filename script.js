@@ -59,6 +59,37 @@ function showToast(message, type) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  /* ======================================================= */
+  /* MOBILE NAVIGATION TOGGLE (HAMBURGER MENU)               */
+  /* ======================================================= */
+  var menuToggle = document.getElementById("menuToggle");
+  var navLinks   = document.getElementById("navLinks");
+
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      menuToggle.classList.toggle("active");
+      navLinks.classList.toggle("active");
+    });
+
+    // Close menu when clicking links
+    var links = navLinks.querySelectorAll("a");
+    links.forEach(function (link) {
+      link.addEventListener("click", function () {
+        menuToggle.classList.remove("active");
+        navLinks.classList.remove("active");
+      });
+    });
+
+    // Close menu when clicking anywhere outside
+    document.addEventListener("click", function (e) {
+      if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+        menuToggle.classList.remove("active");
+        navLinks.classList.remove("active");
+      }
+    });
+  }
+
   var form  = document.getElementById("complaintForm");
   var msgEl = document.getElementById("successMessage");
 

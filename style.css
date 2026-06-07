@@ -76,6 +76,29 @@ transition:.3s;
 color:goldenrod;
 }
 
+/* MENU TOGGLE BUTTON (MOBILE BREADCRUMB) */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.menu-toggle .bar {
+  width: 100%;
+  height: 3px;
+  background-color: goldenrod;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
 /* ========================================= /
 / HERO SECTION /
 / BACKGROUND IMAGE 1 /
@@ -914,18 +937,57 @@ border-top:3px solid gold;
 @media (max-width: 768px) {
   /* Navbar */
   .navbar {
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     padding: 15px 4%;
   }
-  .nav-links {
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+
+  .menu-toggle {
+    display: flex;
   }
+
+  /* Hamburger to 'X' animation */
+  .menu-toggle.active .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .menu-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .menu-toggle.active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(4, 20, 40, 0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid goldenrod;
+    padding: 25px 0;
+    gap: 20px;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .nav-links.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .site-name {
     font-size: 20px;
-    text-align: center;
+    text-align: left;
   }
 
   /* Hero Section */
