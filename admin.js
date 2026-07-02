@@ -181,7 +181,7 @@ function renderDashboardTable(data) {
   const tbody = document.getElementById("dashboard-complaints-body");
   tbody.innerHTML = "";
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="loading-row">No complaints yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">No complaints yet.</td></tr>`;
     return;
   }
   data.forEach(c => {
@@ -231,7 +231,7 @@ function renderComplaintsTable(data) {
   tbody.innerHTML = "";
 
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="loading-row">No complaints found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">No complaints found.</td></tr>`;
     infoEl.textContent = "Showing 0 entries";
     renderPagination(0, data);
     return;
