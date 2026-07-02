@@ -3,71 +3,268 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - IC3 Complaints</title>
+  <title>IC3 Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <!-- Login Section -->
-  <div id="login-section" class="section active">
-    <div class="login-box">
-      <img src="images/logo.png" alt="Logo" class="logo">
-      <h2>Admin Login</h2>
-      <form id="login-form">
-        <input type="email" id="email" placeholder="Email Address" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        <div id="login-error" class="error-text"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Dashboard Section -->
-  <div id="dashboard-section" class="section">
-    <nav class="admin-nav">
-      <h2>IC3 Admin Dashboard</h2>
-      <button id="logout-btn">Logout</button>
-    </nav>
-    
-    <div class="admin-container">
-      
-      <!-- Bulk Email Sender -->
-      <div class="card email-sender">
-        <h3>Send Bulk Email</h3>
-        <p>Send an email to all complainants in the database using Google Workspace SMTP.</p>
-        <form id="bulk-email-form">
-          <input type="text" id="email-subject" placeholder="Subject" required>
-          <textarea id="email-body" rows="6" placeholder="Write your email here... (HTML supported)" required></textarea>
-          <button type="submit" id="send-email-btn">Send to All</button>
-          <div id="email-status"></div>
+  <!-- ===================== LOGIN PAGE ===================== -->
+  <div id="login-page" style="display:none">
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-logo">
+          <img src="images/logo.png" alt="IC3 Logo">
+          <span>IC3 Admin Portal</span>
+        </div>
+        <h2>Welcome Back</h2>
+        <p class="login-sub">Sign in to your admin account</p>
+        <form id="login-form">
+          <div class="field-group">
+            <label>Email Address</label>
+            <div class="input-icon">
+              <i class="fa fa-envelope"></i>
+              <input type="email" id="admin-email" placeholder="admin@ic3.gov" required>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Password</label>
+            <div class="input-icon">
+              <i class="fa fa-lock"></i>
+              <input type="password" id="admin-password" placeholder="••••••••••" required>
+              <button type="button" id="toggle-password" class="toggle-pw"><i class="fa fa-eye"></i></button>
+            </div>
+          </div>
+          <div id="login-error" class="login-error"></div>
+          <button type="submit" id="login-btn" class="login-btn">
+            <span id="login-btn-text">Sign In</span>
+            <span id="login-spinner" class="spinner" style="display:none"></span>
+          </button>
         </form>
       </div>
-
-      <!-- Complaints Table -->
-      <div class="card">
-        <h3>Recent Complaints</h3>
-        <div class="table-container">
-          <table id="complaints-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Category</th>
-                <th>Loss Amount</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Data will be populated here -->
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   </div>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <div id="dashboard-page" style="display:none">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.png" alt="IC3">
+        <span class="logo-text">IC3</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="dashboard">
+          <i class="fa fa-house"></i><span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-section="complaints">
+          <i class="fa fa-file-lines"></i><span>Complaints</span>
+        </a>
+        <a href="#" class="nav-item" data-section="email-center">
+          <i class="fa fa-envelope-open-text"></i><span>Email Center</span>
+        </a>
+        <a href="#" class="nav-item" data-section="reports">
+          <i class="fa fa-chart-bar"></i><span>Reports</span>
+        </a>
+        <a href="#" class="nav-item" data-section="users">
+          <i class="fa fa-users"></i><span>Users</span>
+        </a>
+        <a href="#" class="nav-item" data-section="settings">
+          <i class="fa fa-gear"></i><span>Settings</span>
+        </a>
+        <a href="#" class="nav-item" data-section="audit">
+          <i class="fa fa-shield-halved"></i><span>Audit Logs</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Admin User</span>
+            <span class="user-role">Administrator</span>
+          </div>
+          <button class="user-menu-btn" id="logout-btn" title="Logout"><i class="fa fa-right-from-bracket"></i></button>
+        </div>
+        <button class="collapse-btn" id="collapse-btn">
+          <i class="fa fa-left-long"></i><span>Collapse</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper" id="main-wrapper">
+
+      <!-- TOP NAV -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" id="hamburger"><i class="fa fa-bars"></i></button>
+          <h1 class="page-title">IC3 Admin Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="search-box">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search..." id="global-search">
+          </div>
+          <button class="icon-btn notif-btn">
+            <i class="fa fa-bell"></i>
+            <span class="badge">3</span>
+          </button>
+          <button class="icon-btn" id="dark-mode-btn" title="Toggle dark mode">
+            <i class="fa fa-moon"></i>
+          </button>
+          <div class="topbar-user">
+            <div class="user-avatar sm">A</div>
+            <div>
+              <div class="tb-name">Admin User</div>
+              <div class="tb-role">Administrator</div>
+            </div>
+            <i class="fa fa-chevron-down" style="font-size:11px;margin-left:4px"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGE BODY -->
+      <main class="content">
+
+        <!-- STAT CARDS -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa fa-file-lines"></i></div>
+            <div class="stat-info">
+              <p>Total Complaints</p>
+              <h3 id="stat-total">—</h3>
+              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> 12.5% from last month</span>
+            </div>
+            <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
+              <polyline points="0,25 15,20 25,22 40,10 55,15 70,8 80,5" fill="none" stroke="#6C63FF" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fa fa-dollar-sign"></i></div>
+            <div class="stat-info">
+              <p>Total Loss Amount</p>
+              <h3 id="stat-loss">—</h3>
+              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> 8.4% from last month</span>
+            </div>
+            <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
+              <polyline points="0,28 15,22 25,20 40,15 55,18 70,10 80,6" fill="none" stroke="#10b981" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa fa-paper-plane"></i></div>
+            <div class="stat-info">
+              <p>Emails Sent</p>
+              <h3 id="stat-emails">—</h3>
+              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> 15.3% from last month</span>
+            </div>
+            <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
+              <polyline points="0,22 15,18 25,20 40,12 55,10 70,6 80,4" fill="none" stroke="#3b82f6" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="fa fa-clock"></i></div>
+            <div class="stat-info">
+              <p>Pending Complaints</p>
+              <h3 id="stat-pending">—</h3>
+              <span class="stat-trend down"><i class="fa fa-arrow-down"></i> 5.1% from last month</span>
+            </div>
+            <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
+              <polyline points="0,5 15,10 25,8 40,15 55,12 70,18 80,22" fill="none" stroke="#f59e0b" stroke-width="2"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- BULK EMAIL CARD -->
+        <div class="card email-card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="card-icon blue"><i class="fa fa-envelope-open-text"></i></div>
+              <div>
+                <h3>Send Bulk Email</h3>
+                <p>Send an email to all complainants in the database using Google Workspace SMTP.</p>
+              </div>
+            </div>
+            <button class="btn-primary" id="send-email-btn">
+              <i class="fa fa-paper-plane"></i> Send to All
+            </button>
+          </div>
+          <form id="bulk-email-form">
+            <input type="text" id="email-subject" class="email-subject-input" placeholder="Email Subject" required>
+            <div class="editor-toolbar">
+              <button type="button" onclick="document.execCommand('bold')" title="Bold"><b>B</b></button>
+              <button type="button" onclick="document.execCommand('italic')" title="Italic"><i>I</i></button>
+              <button type="button" onclick="document.execCommand('underline')" title="Underline"><u>U</u></button>
+              <div class="toolbar-divider"></div>
+              <button type="button" onclick="document.execCommand('insertUnorderedList')" title="Bullet list"><i class="fa fa-list-ul"></i></button>
+              <button type="button" onclick="document.execCommand('insertOrderedList')" title="Ordered list"><i class="fa fa-list-ol"></i></button>
+              <div class="toolbar-divider"></div>
+              <button type="button" onclick="document.execCommand('justifyLeft')" title="Align left"><i class="fa fa-align-left"></i></button>
+              <button type="button" onclick="document.execCommand('justifyCenter')" title="Center"><i class="fa fa-align-center"></i></button>
+              <button type="button" onclick="document.execCommand('justifyRight')" title="Align right"><i class="fa fa-align-right"></i></button>
+            </div>
+            <div id="email-body" class="email-editor" contenteditable="true" data-placeholder="Write your email here... (HTML supported)"></div>
+            <div class="editor-footer">
+              <span id="word-count">Words: 0</span>
+            </div>
+          </form>
+          <div id="email-status"></div>
+        </div>
+
+        <!-- COMPLAINTS TABLE CARD -->
+        <div class="card table-card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="card-icon purple"><i class="fa fa-file-lines"></i></div>
+              <h3>Recent Complaints</h3>
+            </div>
+            <button class="btn-outline">View All</button>
+          </div>
+          <div class="table-wrapper">
+            <table id="complaints-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Category</th>
+                  <th>Loss Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="7" class="loading-row"><i class="fa fa-spinner fa-spin"></i> Loading complaints...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span id="table-info">Showing 0 entries</span>
+            <div class="pagination" id="pagination"></div>
+          </div>
+        </div>
+
+      </main>
+    </div><!-- end main-wrapper -->
+  </div><!-- end dashboard-page -->
+
+  <!-- ===================== MODAL: VIEW COMPLAINT ===================== -->
+  <div class="modal-overlay" id="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Complaint Details</h3>
+        <button class="modal-close" id="modal-close"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
 
   <script src="admin.js"></script>
 </body>
