@@ -58,25 +58,25 @@
       </div>
 
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-section="dashboard">
+        <a href="#" class="nav-item active" data-page="dashboard">
           <i class="fa fa-house"></i><span>Dashboard</span>
         </a>
-        <a href="#" class="nav-item" data-section="complaints">
+        <a href="#" class="nav-item" data-page="complaints">
           <i class="fa fa-file-lines"></i><span>Complaints</span>
         </a>
-        <a href="#" class="nav-item" data-section="email-center">
+        <a href="#" class="nav-item" data-page="email-center">
           <i class="fa fa-envelope-open-text"></i><span>Email Center</span>
         </a>
-        <a href="#" class="nav-item" data-section="reports">
+        <a href="#" class="nav-item" data-page="reports">
           <i class="fa fa-chart-bar"></i><span>Reports</span>
         </a>
-        <a href="#" class="nav-item" data-section="users">
+        <a href="#" class="nav-item" data-page="users">
           <i class="fa fa-users"></i><span>Users</span>
         </a>
-        <a href="#" class="nav-item" data-section="settings">
+        <a href="#" class="nav-item" data-page="settings">
           <i class="fa fa-gear"></i><span>Settings</span>
         </a>
-        <a href="#" class="nav-item" data-section="audit">
+        <a href="#" class="nav-item" data-page="audit">
           <i class="fa fa-shield-halved"></i><span>Audit Logs</span>
         </a>
       </nav>
@@ -85,7 +85,7 @@
         <div class="sidebar-user">
           <div class="user-avatar">A</div>
           <div class="user-info">
-            <span class="user-name">Admin User</span>
+            <span class="user-name" id="sidebar-username">Admin User</span>
             <span class="user-role">Administrator</span>
           </div>
           <button class="user-menu-btn" id="logout-btn" title="Logout"><i class="fa fa-right-from-bracket"></i></button>
@@ -103,7 +103,7 @@
       <header class="topbar">
         <div class="topbar-left">
           <button class="hamburger" id="hamburger"><i class="fa fa-bars"></i></button>
-          <h1 class="page-title">IC3 Admin Dashboard</h1>
+          <h1 class="page-title" id="page-title">IC3 Admin Dashboard</h1>
         </div>
         <div class="topbar-right">
           <div class="search-box">
@@ -112,7 +112,7 @@
           </div>
           <button class="icon-btn notif-btn">
             <i class="fa fa-bell"></i>
-            <span class="badge">3</span>
+            <span class="badge" id="notif-badge">3</span>
           </button>
           <button class="icon-btn" id="dark-mode-btn" title="Toggle dark mode">
             <i class="fa fa-moon"></i>
@@ -120,7 +120,7 @@
           <div class="topbar-user">
             <div class="user-avatar sm">A</div>
             <div>
-              <div class="tb-name">Admin User</div>
+              <div class="tb-name" id="topbar-username">Admin User</div>
               <div class="tb-role">Administrator</div>
             </div>
             <i class="fa fa-chevron-down" style="font-size:11px;margin-left:4px"></i>
@@ -128,20 +128,18 @@
         </div>
       </header>
 
-      <!-- PAGE BODY -->
-      <main class="content">
-
-        <!-- STAT CARDS -->
+      <!-- ======================== PAGE: DASHBOARD ======================== -->
+      <main class="content page-content" id="page-dashboard">
         <div class="stat-grid">
           <div class="stat-card">
             <div class="stat-icon purple"><i class="fa fa-file-lines"></i></div>
             <div class="stat-info">
               <p>Total Complaints</p>
               <h3 id="stat-total">—</h3>
-              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> 12.5% from last month</span>
+              <span class="stat-trend up" id="stat-total-trend"><i class="fa fa-arrow-up"></i> Loading...</span>
             </div>
             <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
-              <polyline points="0,25 15,20 25,22 40,10 55,15 70,8 80,5" fill="none" stroke="#6C63FF" stroke-width="2"/>
+              <polyline id="spark-total" points="0,25 20,20 40,15 60,10 80,5" fill="none" stroke="#6C63FF" stroke-width="2"/>
             </svg>
           </div>
           <div class="stat-card">
@@ -149,7 +147,7 @@
             <div class="stat-info">
               <p>Total Loss Amount</p>
               <h3 id="stat-loss">—</h3>
-              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> 8.4% from last month</span>
+              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> From all complaints</span>
             </div>
             <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
               <polyline points="0,28 15,22 25,20 40,15 55,18 70,10 80,6" fill="none" stroke="#10b981" stroke-width="2"/>
@@ -158,9 +156,9 @@
           <div class="stat-card">
             <div class="stat-icon blue"><i class="fa fa-paper-plane"></i></div>
             <div class="stat-info">
-              <p>Emails Sent</p>
+              <p>Email Recipients</p>
               <h3 id="stat-emails">—</h3>
-              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> 15.3% from last month</span>
+              <span class="stat-trend up"><i class="fa fa-arrow-up"></i> Total recipients</span>
             </div>
             <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
               <polyline points="0,22 15,18 25,20 40,12 55,10 70,6 80,4" fill="none" stroke="#3b82f6" stroke-width="2"/>
@@ -171,7 +169,7 @@
             <div class="stat-info">
               <p>Pending Complaints</p>
               <h3 id="stat-pending">—</h3>
-              <span class="stat-trend down"><i class="fa fa-arrow-down"></i> 5.1% from last month</span>
+              <span class="stat-trend down"><i class="fa fa-arrow-down"></i> Needs attention</span>
             </div>
             <svg class="sparkline" viewBox="0 0 80 30" preserveAspectRatio="none">
               <polyline points="0,5 15,10 25,8 40,15 55,12 70,18 80,22" fill="none" stroke="#f59e0b" stroke-width="2"/>
@@ -179,66 +177,107 @@
           </div>
         </div>
 
-        <!-- BULK EMAIL CARD -->
+        <!-- Quick Email -->
         <div class="card email-card">
           <div class="card-header">
             <div class="card-title">
               <div class="card-icon blue"><i class="fa fa-envelope-open-text"></i></div>
               <div>
                 <h3>Send Bulk Email</h3>
-                <p>Send an email to all complainants in the database using Google Workspace SMTP.</p>
+                <p>Send bulk email</p>
               </div>
             </div>
             <button class="btn-primary" id="send-email-btn">
               <i class="fa fa-paper-plane"></i> Send to All
             </button>
           </div>
-          <form id="bulk-email-form">
+          <div class="email-compose-wrap">
             <input type="text" id="email-subject" class="email-subject-input" placeholder="Email Subject" required>
             <div class="editor-toolbar">
               <button type="button" onclick="document.execCommand('bold')" title="Bold"><b>B</b></button>
               <button type="button" onclick="document.execCommand('italic')" title="Italic"><i>I</i></button>
               <button type="button" onclick="document.execCommand('underline')" title="Underline"><u>U</u></button>
               <div class="toolbar-divider"></div>
-              <button type="button" onclick="document.execCommand('insertUnorderedList')" title="Bullet list"><i class="fa fa-list-ul"></i></button>
-              <button type="button" onclick="document.execCommand('insertOrderedList')" title="Ordered list"><i class="fa fa-list-ol"></i></button>
+              <button type="button" onclick="document.execCommand('insertUnorderedList')"><i class="fa fa-list-ul"></i></button>
+              <button type="button" onclick="document.execCommand('insertOrderedList')"><i class="fa fa-list-ol"></i></button>
               <div class="toolbar-divider"></div>
-              <button type="button" onclick="document.execCommand('justifyLeft')" title="Align left"><i class="fa fa-align-left"></i></button>
-              <button type="button" onclick="document.execCommand('justifyCenter')" title="Center"><i class="fa fa-align-center"></i></button>
-              <button type="button" onclick="document.execCommand('justifyRight')" title="Align right"><i class="fa fa-align-right"></i></button>
+              <button type="button" onclick="document.execCommand('justifyLeft')"><i class="fa fa-align-left"></i></button>
+              <button type="button" onclick="document.execCommand('justifyCenter')"><i class="fa fa-align-center"></i></button>
+              <button type="button" onclick="document.execCommand('justifyRight')"><i class="fa fa-align-right"></i></button>
             </div>
             <div id="email-body" class="email-editor" contenteditable="true" data-placeholder="Write your email here... (HTML supported)"></div>
             <div class="editor-footer">
               <span id="word-count">Words: 0</span>
             </div>
-          </form>
-          <div id="email-status"></div>
+          </div>
+          <div id="email-status" style="padding:0 24px 14px;font-size:13px"></div>
         </div>
 
-        <!-- COMPLAINTS TABLE CARD -->
+        <!-- Recent Complaints -->
         <div class="card table-card">
           <div class="card-header">
             <div class="card-title">
               <div class="card-icon purple"><i class="fa fa-file-lines"></i></div>
               <h3>Recent Complaints</h3>
             </div>
-            <button class="btn-outline">View All</button>
+            <button class="btn-outline" onclick="switchPage('complaints')">View All</button>
           </div>
+          <div class="table-wrapper">
+            <table id="dashboard-complaints-table">
+              <thead>
+                <tr>
+                  <th>Date</th><th>Name</th><th>Email</th>
+                  <th>Category</th><th>Loss Amount</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-complaints-body">
+                <tr><td colspan="7" class="loading-row">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- ======================== PAGE: COMPLAINTS ======================== -->
+      <main class="content page-content" id="page-complaints" style="display:none">
+        <div class="page-header">
+          <div>
+            <h2>Complaints</h2>
+            <p>All submitted complaints from the public portal</p>
+          </div>
+          <div class="page-header-actions">
+            <div class="filter-group">
+              <select id="filter-category" class="filter-select">
+                <option value="">All Categories</option>
+                <option>Crypto Scam</option>
+                <option>Romance Scam</option>
+                <option>Investment Fraud</option>
+                <option>Social Media Scam</option>
+                <option>Identity Theft</option>
+              </select>
+              <select id="filter-status" class="filter-select">
+                <option value="">All Status</option>
+                <option>New</option>
+                <option>In Review</option>
+                <option>In Progress</option>
+                <option>Resolved</option>
+              </select>
+              <input type="text" id="complaint-search" class="filter-input" placeholder="Search name, email...">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
           <div class="table-wrapper">
             <table id="complaints-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Category</th>
-                  <th>Loss Amount</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Date</th><th>Name</th><th>Email</th>
+                  <th>Category</th><th>Loss Amount</th><th>Status</th><th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr><td colspan="7" class="loading-row"><i class="fa fa-spinner fa-spin"></i> Loading complaints...</td></tr>
+              <tbody id="complaints-tbody">
+                <tr><td colspan="7" class="loading-row">Loading complaints...</td></tr>
               </tbody>
             </table>
           </div>
@@ -247,8 +286,302 @@
             <div class="pagination" id="pagination"></div>
           </div>
         </div>
-
       </main>
+
+      <!-- ======================== PAGE: EMAIL CENTER ======================== -->
+      <main class="content page-content" id="page-email-center" style="display:none">
+        <div class="page-header">
+          <div>
+            <h2>Email Center</h2>
+            <p>Compose and send bulk emails to your recipient list</p>
+          </div>
+        </div>
+
+        <div class="email-center-grid">
+          <!-- Left: Compose -->
+          <div class="card compose-card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-icon blue"><i class="fa fa-pen-to-square"></i></div>
+                <h3>Compose Email</h3>
+              </div>
+              <button class="btn-primary" id="ec-send-btn">
+                <i class="fa fa-paper-plane"></i> Send
+              </button>
+            </div>
+
+            <!-- Recipient Selector -->
+            <div class="recipient-selector">
+              <label class="recip-label">Send To:</label>
+              <div class="recip-options">
+                <label class="recip-option">
+                  <input type="radio" name="recip-mode" value="all-complainants" checked>
+                  <span>All Complainants</span>
+                </label>
+                <label class="recip-option">
+                  <input type="radio" name="recip-mode" value="all-recipients">
+                  <span>All Recipients</span>
+                </label>
+                <label class="recip-option">
+                  <input type="radio" name="recip-mode" value="both">
+                  <span>Both</span>
+                </label>
+                <label class="recip-option">
+                  <input type="radio" name="recip-mode" value="custom">
+                  <span>Custom List</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Custom recipient input (shown when "custom" selected) -->
+            <div id="custom-recip-box" class="custom-recip-box" style="display:none">
+              <div class="tag-input-wrap">
+                <div id="email-tags" class="email-tags"></div>
+                <input type="email" id="tag-input" placeholder="Type email and press Enter..." class="tag-text-input">
+              </div>
+              <p class="hint-text">Press <kbd>Enter</kbd> or <kbd>,</kbd> to add each email</p>
+            </div>
+
+            <input type="text" id="ec-subject" class="email-subject-input" placeholder="Email Subject" required>
+            <div class="editor-toolbar">
+              <button type="button" onclick="document.execCommand('bold')"><b>B</b></button>
+              <button type="button" onclick="document.execCommand('italic')"><i>I</i></button>
+              <button type="button" onclick="document.execCommand('underline')"><u>U</u></button>
+              <div class="toolbar-divider"></div>
+              <button type="button" onclick="document.execCommand('insertUnorderedList')"><i class="fa fa-list-ul"></i></button>
+              <button type="button" onclick="document.execCommand('insertOrderedList')"><i class="fa fa-list-ol"></i></button>
+              <div class="toolbar-divider"></div>
+              <button type="button" onclick="document.execCommand('justifyLeft')"><i class="fa fa-align-left"></i></button>
+              <button type="button" onclick="document.execCommand('justifyCenter')"><i class="fa fa-align-center"></i></button>
+              <button type="button" onclick="document.execCommand('justifyRight')"><i class="fa fa-align-right"></i></button>
+            </div>
+            <div id="ec-body" class="email-editor" contenteditable="true" data-placeholder="Write your email here..."></div>
+            <div class="editor-footer"><span id="ec-word-count">Words: 0</span></div>
+            <div id="ec-status" style="padding:0 24px 14px;font-size:13px"></div>
+          </div>
+
+          <!-- Right: Recipients List -->
+          <div class="recipients-panel">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <div class="card-icon purple"><i class="fa fa-users"></i></div>
+                  <h3>Saved Recipients</h3>
+                </div>
+                <button class="btn-primary" id="add-recipient-btn" style="font-size:12px;padding:8px 12px">
+                  <i class="fa fa-plus"></i> Add
+                </button>
+              </div>
+
+              <!-- Add Recipient Form -->
+              <div id="add-recip-form" class="add-recip-form" style="display:none">
+                <input type="text" id="recip-name" placeholder="Full Name (optional)" class="recip-input">
+                <input type="email" id="recip-email" placeholder="Email Address *" class="recip-input" required>
+                <input type="text" id="recip-tags" placeholder="Tags (e.g. vip, staff)" class="recip-input">
+                <div style="display:flex;gap:8px;padding:10px 20px">
+                  <button class="btn-primary" id="save-recipient-btn" style="flex:1"><i class="fa fa-save"></i> Save</button>
+                  <button class="btn-outline" id="cancel-recip-btn">Cancel</button>
+                </div>
+              </div>
+
+              <div class="recip-search-wrap">
+                <div class="search-box" style="flex:1">
+                  <i class="fa fa-search"></i>
+                  <input type="text" id="recip-search" placeholder="Search recipients...">
+                </div>
+              </div>
+
+              <div id="recipients-list" class="recipients-list">
+                <div class="empty-state"><i class="fa fa-inbox"></i><p>No recipients yet</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ======================== PAGE: REPORTS ======================== -->
+      <main class="content page-content" id="page-reports" style="display:none">
+        <div class="page-header">
+          <div><h2>Reports</h2><p>Complaint analytics and statistics overview</p></div>
+        </div>
+
+        <div class="reports-grid">
+          <div class="card report-card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-icon purple"><i class="fa fa-chart-pie"></i></div>
+                <h3>Complaints by Category</h3>
+              </div>
+            </div>
+            <div id="category-chart" class="bar-chart-wrap"></div>
+          </div>
+          <div class="card report-card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-icon orange"><i class="fa fa-chart-line"></i></div>
+                <h3>Complaints by Status</h3>
+              </div>
+            </div>
+            <div id="status-chart" class="bar-chart-wrap"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="card-icon green"><i class="fa fa-table"></i></div>
+              <h3>Loss Amount Summary</h3>
+            </div>
+          </div>
+          <div id="loss-summary" class="loss-summary-wrap"></div>
+        </div>
+      </main>
+
+      <!-- ======================== PAGE: USERS ======================== -->
+      <main class="content page-content" id="page-users" style="display:none">
+        <div class="page-header">
+          <div><h2>Users</h2><p>Manage admin users and access levels</p></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="card-icon blue"><i class="fa fa-user-shield"></i></div>
+              <h3>Admin Users</h3>
+            </div>
+          </div>
+          <div id="users-list" class="users-list">
+            <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading users...</p></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ======================== PAGE: SETTINGS ======================== -->
+      <main class="content page-content" id="page-settings" style="display:none">
+        <div class="page-header">
+          <div><h2>Settings</h2><p>Configure your portal and email delivery options</p></div>
+        </div>
+
+        <div class="settings-grid">
+
+          <!-- Email Settings -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-icon blue"><i class="fa fa-envelope"></i></div>
+                <h3>Email / SMTP Settings</h3>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="smtp-enabled">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-form" id="smtp-form">
+              <div class="settings-row">
+                <label>SMTP Host</label>
+                <input type="text" id="smtp-host" placeholder="smtp.gmail.com" class="setting-input">
+              </div>
+              <div class="settings-row">
+                <label>SMTP Port</label>
+                <input type="number" id="smtp-port" placeholder="465" class="setting-input">
+              </div>
+              <div class="settings-row">
+                <label>Username / Email</label>
+                <input type="email" id="smtp-user" placeholder="you@yourworkspace.com" class="setting-input">
+              </div>
+              <div class="settings-row">
+                <label>App Password</label>
+                <div class="input-icon" style="max-width:100%">
+                  <input type="password" id="smtp-pass" placeholder="Google App Password" class="setting-input" style="padding-left:14px">
+                  <button type="button" class="toggle-pw" onclick="toggleSmtpPass()" style="right:10px"><i class="fa fa-eye" id="smtp-pass-eye"></i></button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <label>From Name</label>
+                <input type="text" id="smtp-from-name" placeholder="IC3 Complaints Team" class="setting-input">
+              </div>
+              <div class="settings-row">
+                <label>From Email</label>
+                <input type="email" id="smtp-from-email" placeholder="noreply@yourdomain.com" class="setting-input">
+              </div>
+              <div class="settings-row">
+                <label>Confirmation Email Template</label>
+                <textarea id="smtp-confirm-template" rows="5" class="setting-input" style="resize:vertical"
+                  placeholder="Dear {{name}}, your complaint has been received..."></textarea>
+              </div>
+              <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px">
+                <button class="btn-primary" id="save-smtp-btn"><i class="fa fa-save"></i> Save Settings</button>
+                <button class="btn-outline" id="test-smtp-btn"><i class="fa fa-paper-plane"></i> Send Test Email</button>
+              </div>
+              <div id="smtp-status" style="padding:0 24px 14px;font-size:13px"></div>
+            </div>
+          </div>
+
+          <!-- Portal Settings -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-icon purple"><i class="fa fa-sliders"></i></div>
+                <h3>Portal Settings</h3>
+              </div>
+            </div>
+            <div class="settings-form">
+              <div class="settings-row">
+                <label>Portal Name</label>
+                <input type="text" id="portal-name" placeholder="IC3 Complaints Portal" class="setting-input">
+              </div>
+              <div class="settings-row">
+                <label>Contact Email</label>
+                <input type="email" id="portal-contact-email" placeholder="contact@ic3.gov" class="setting-input">
+              </div>
+              <div class="settings-row settings-toggle-row">
+                <label>Auto-send confirmation email on complaint</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="auto-confirm-email" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="settings-row settings-toggle-row">
+                <label>Dark Mode by default</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="default-dark-mode">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div style="padding:16px 24px;border-top:1px solid var(--border)">
+                <button class="btn-primary" id="save-portal-btn"><i class="fa fa-save"></i> Save Settings</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- ======================== PAGE: AUDIT LOGS ======================== -->
+      <main class="content page-content" id="page-audit" style="display:none">
+        <div class="page-header">
+          <div><h2>Audit Logs</h2><p>Track all important actions taken in the admin panel</p></div>
+          <button class="btn-outline" id="clear-logs-btn"><i class="fa fa-trash"></i> Clear Logs</button>
+        </div>
+        <div class="card">
+          <div class="table-wrapper">
+            <table id="audit-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody id="audit-tbody">
+                <tr><td colspan="4" class="loading-row">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
     </div><!-- end main-wrapper -->
   </div><!-- end dashboard-page -->
 
