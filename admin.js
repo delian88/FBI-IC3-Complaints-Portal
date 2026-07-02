@@ -10,6 +10,24 @@ let currentPage    = 1;
 const PAGE_SIZE    = 10;
 let allComplaints  = [];
 
+/* ============ ANIMATED NUMBER COUNTER ============ */
+function animateCount(el, target, prefix, suffix, duration) {
+  prefix   = prefix   || "";
+  suffix   = suffix   || "";
+  duration = duration || 1200;
+  const start     = performance.now();
+  const isFloat   = String(target).includes(".");
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease     = 1 - Math.pow(1 - progress, 3); // ease-out-cubic
+    const current  = isFloat ? (target * ease).toFixed(1) : Math.floor(target * ease);
+    el.textContent = prefix + Number(current).toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+
 /* ============ TOAST ============ */
 function showToast(message, type) {
   type = type || "success";
@@ -173,19 +191,27 @@ async function loadComplaints() {
 
 /* ============ STATS ============ */
 function updateStats(data) {
-  document.getElementById("stat-total").textContent   = data.length.toLocaleString();
+  const total   = data.length;
   const pending = data.filter(c => !c.status || c.status === "New").length;
-  document.getElementById("stat-pending").textContent = pending.toLocaleString();
-
-  const total = data.reduce((sum, c) => {
+  const loss    = data.reduce((sum, c) => {
     const n = parseFloat(String(c.lossamount || "0").replace(/[^0-9.]/g, ""));
     return sum + (isNaN(n) ? 0 : n);
   }, 0);
 
-  const formatted = total >= 1_000_000
-    ? "$" + (total / 1_000_000).toFixed(1) + "M"
-    : "$" + total.toLocaleString();
-  document.getElementById("stat-loss").textContent   = formatted;
+  // Animate total complaints
+  animateCount(document.getElementById("stat-total"), total);
+
+  // Animate pending
+  animateCount(document.getElementById("stat-pending"), pending);
+
+  // Animate loss
+  if (loss >= 1_000_000) {
+    animateCount(document.getElementById("stat-loss"), loss / 1_000_000, "$", "M");
+  } else {
+    animateCount(document.getElementById("stat-loss"), loss, "$");
+  }
+
+  // Emails (placeholder)
   document.getElementById("stat-emails").textContent = "—";
 }
 

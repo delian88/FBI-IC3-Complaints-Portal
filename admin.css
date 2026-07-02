@@ -754,3 +754,289 @@ body.dark-mode {
   .stat-grid { grid-template-columns: 1fr; }
   .search-box { display: none; }
 }
+
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+/* --- Keyframes --- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.88); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(108,99,255,.4); }
+  70%  { box-shadow: 0 0 0 10px rgba(108,99,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(108,99,255,0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes drawLine {
+  from { stroke-dashoffset: 200; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typeCursor {
+  0%, 100% { border-color: transparent; }
+  50%       { border-color: var(--accent); }
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes badgePop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes rowSlideIn {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --- Sidebar entrance --- */
+.sidebar {
+  animation: fadeInLeft .4s ease both;
+}
+
+.nav-item {
+  opacity: 0;
+  animation: fadeInLeft .35s ease forwards;
+}
+
+.nav-item:nth-child(1) { animation-delay: .1s; }
+.nav-item:nth-child(2) { animation-delay: .16s; }
+.nav-item:nth-child(3) { animation-delay: .22s; }
+.nav-item:nth-child(4) { animation-delay: .28s; }
+.nav-item:nth-child(5) { animation-delay: .34s; }
+.nav-item:nth-child(6) { animation-delay: .40s; }
+.nav-item:nth-child(7) { animation-delay: .46s; }
+
+/* --- Topbar entrance --- */
+.topbar {
+  animation: fadeInDown .4s ease both;
+}
+
+/* --- Stat Cards --- */
+.stat-card {
+  animation: fadeInUp .5s ease both;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+
+.stat-card:nth-child(1) { animation-delay: .15s; }
+.stat-card:nth-child(2) { animation-delay: .25s; }
+.stat-card:nth-child(3) { animation-delay: .35s; }
+.stat-card:nth-child(4) { animation-delay: .45s; }
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(108,99,255,.15);
+}
+
+/* Floating icon animation on stat card hover */
+.stat-card:hover .stat-icon {
+  animation: floatIcon .8s ease infinite;
+}
+
+/* Animated number */
+.stat-info h3 {
+  animation: countUp .5s ease both;
+}
+
+/* --- Cards (email + table) --- */
+.email-card {
+  animation: fadeInUp .5s ease .3s both;
+}
+
+.table-card {
+  animation: fadeInUp .5s ease .4s both;
+}
+
+/* Card hover lift */
+.card {
+  transition: box-shadow .22s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,.1);
+}
+
+/* --- Sparkline draw animation --- */
+.sparkline polyline {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: drawLine 1.2s ease forwards;
+}
+
+.stat-card:nth-child(1) .sparkline polyline { animation-delay: .5s; }
+.stat-card:nth-child(2) .sparkline polyline { animation-delay: .6s; }
+.stat-card:nth-child(3) .sparkline polyline { animation-delay: .7s; }
+.stat-card:nth-child(4) .sparkline polyline { animation-delay: .8s; }
+
+/* --- Stat icon pulse on load --- */
+.stat-card:nth-child(1) .stat-icon { animation: pulse-ring 2s ease 1s 2; }
+
+/* --- Table row stagger --- */
+#complaints-table tbody tr {
+  animation: rowSlideIn .3s ease both;
+}
+
+#complaints-table tbody tr:nth-child(1)  { animation-delay: .05s; }
+#complaints-table tbody tr:nth-child(2)  { animation-delay: .10s; }
+#complaints-table tbody tr:nth-child(3)  { animation-delay: .15s; }
+#complaints-table tbody tr:nth-child(4)  { animation-delay: .20s; }
+#complaints-table tbody tr:nth-child(5)  { animation-delay: .25s; }
+#complaints-table tbody tr:nth-child(6)  { animation-delay: .30s; }
+#complaints-table tbody tr:nth-child(7)  { animation-delay: .35s; }
+#complaints-table tbody tr:nth-child(8)  { animation-delay: .40s; }
+#complaints-table tbody tr:nth-child(9)  { animation-delay: .45s; }
+#complaints-table tbody tr:nth-child(10) { animation-delay: .50s; }
+
+/* --- Badge pop animation --- */
+.badge-category, .badge-status {
+  animation: badgePop .3s ease both;
+}
+
+/* --- Button hover glow --- */
+.btn-primary {
+  background-size: 200% 200%;
+  transition: opacity .2s, transform .18s, box-shadow .18s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108,99,255,.4);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+/* --- Action button hover --- */
+.act-btn {
+  transition: background .18s, color .18s, transform .15s;
+}
+
+.act-btn:hover { transform: scale(1.12); }
+
+/* --- Login card entrance --- */
+.login-card {
+  animation: scaleIn .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* --- Login logo glow --- */
+.login-logo img {
+  animation: pulse-ring 3s ease 1s infinite;
+  border-radius: 50%;
+}
+
+/* --- Login button gradient shift --- */
+.login-btn {
+  background: linear-gradient(135deg, #6C63FF, #8b85ff, #6C63FF);
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+  transition: transform .18s, box-shadow .18s;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(108,99,255,.5);
+}
+
+/* --- Page title typing cursor --- */
+.page-title {
+  border-right: 2px solid transparent;
+  animation: typeCursor 1s step-end 6;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* --- Notification badge bounce --- */
+.badge {
+  animation: badgePop .4s cubic-bezier(.34,1.56,.64,1) .5s both;
+}
+
+/* --- Modal entrance --- */
+.modal {
+  animation: scaleIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* --- Sidebar user avatar pulse --- */
+.user-avatar {
+  transition: transform .2s;
+}
+
+.sidebar-footer:hover .user-avatar {
+  transform: scale(1.08);
+}
+
+/* --- Loading shimmer for table --- */
+.loading-row {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s linear infinite;
+  color: transparent !important;
+  border-radius: 8px;
+}
+
+/* --- Collapse button arrow spin --- */
+.sidebar.collapsed .collapse-btn i {
+  transform: rotate(180deg);
+  transition: transform .3s;
+}
+
+.collapse-btn i {
+  transition: transform .3s;
+}
+
+/* --- Icon button hover spin --- */
+.icon-btn { transition: background .18s, transform .18s; }
+.icon-btn:hover { transform: rotate(-8deg) scale(1.08); }
+
+/* --- Search box focus glow --- */
+.search-box {
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.search-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108,99,255,.12);
+}
