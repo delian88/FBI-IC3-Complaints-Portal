@@ -1,0 +1,21 @@
+{
+  "name": "fbi-ic3-complaints-portal",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx serve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delian88/FBI-IC3-Complaints-Portal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/delian88/FBI-IC3-Complaints-Portal/issues"
+  },
+  "homepage": "https://github.com/delian88/FBI-IC3-Complaints-Portal#readme",
+  "description": ""
+}
