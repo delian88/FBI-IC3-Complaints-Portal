@@ -431,7 +431,19 @@ async function sendEmail(subject, htmlBody, targetEmails, attachments) {
   });
 
   if (error) {
-    showToast("Error: " + error.message, "error");
+    let errMsg = error.message;
+    if (error.context) {
+      try {
+        const body = await error.context.json();
+        if (body && body.error) errMsg = body.error;
+      } catch (e) {
+        try {
+          const text = await error.context.text();
+          if (text) errMsg = text;
+        } catch (e2) {}
+      }
+    }
+    showToast("Error: " + errMsg, "error");
     return false;
   }
 
