@@ -125,13 +125,34 @@ function showLogin() {
    DASHBOARD PAGE
    ===================================================== */
 async function loadDashboard() {
-  const [{ data: complaints }, { data: recipients }] = await Promise.all([
-    supabaseClient.from("complaints").select("*").order("created_at", { ascending: false }),
-    supabaseClient.from("email_recipients").select("*"),
-  ]);
+  let complaints = [];
+  let recipients = [];
 
-  allComplaints = complaints || [];
-  allRecipients = recipients || [];
+  try {
+    const { data, error } = await supabaseClient
+      .from("complaints")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    complaints = data || [];
+  } catch (err) {
+    console.error("Error loading complaints:", err);
+    showToast("Complaints table query failed. Check database configuration.", "error");
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("email_recipients")
+      .select("*");
+    if (error) throw error;
+    recipients = data || [];
+  } catch (err) {
+    console.error("Error loading email recipients:", err);
+    showToast("Email recipients query failed. Run settings migration.", "info");
+  }
+
+  allComplaints = complaints;
+  allRecipients = recipients;
 
   updateStats(allComplaints, allRecipients);
   renderDashboardTable(allComplaints.slice(0, 5));
@@ -328,11 +349,16 @@ window.deleteComplaint = async function(id) {
    EMAIL CENTER
    ===================================================== */
 async function loadRecipients() {
-  const { data, error } = await supabaseClient.from("email_recipients").select("*").order("created_at", { ascending: false });
-  if (error) { console.error(error); return; }
-  allRecipients = data || [];
-  renderRecipientsList(allRecipients);
-  animateCount(document.getElementById("stat-emails"), allRecipients.length);
+  try {
+    const { data, error } = await supabaseClient.from("email_recipients").select("*").order("created_at", { ascending: false });
+    if (error) throw error;
+    allRecipients = data || [];
+    renderRecipientsList(allRecipients);
+    animateCount(document.getElementById("stat-emails"), allRecipients.length);
+  } catch (err) {
+    console.error("Error loading recipients:", err);
+    renderRecipientsList([]);
+  }
 }
 
 function renderRecipientsList(data) {
@@ -559,42 +585,51 @@ window.toggleSmtpPass = function() {
    AUDIT LOGS
    ===================================================== */
 async function logAudit(action, details) {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  await supabaseClient.from("audit_logs").insert([{
-    action, details, user_email: user ? user.email : currentUserEmail
-  }]);
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    await supabaseClient.from("audit_logs").insert([{
+      action, details, user_email: user ? user.email : currentUserEmail
+    }]);
+  } catch (err) {
+    console.error("Failed to write audit log:", err);
+  }
 }
 
 async function loadAuditLogs() {
-  const { data, error } = await supabaseClient
-    .from("audit_logs").select("*").order("created_at", { ascending: false }).limit(100);
-
   const tbody = document.getElementById("audit-tbody");
   tbody.innerHTML = "";
 
-  if (error || !data || !data.length) {
+  try {
+    const { data, error } = await supabaseClient
+      .from("audit_logs").select("*").order("created_at", { ascending: false }).limit(100);
+
+    if (error || !data || !data.length) {
+      tbody.innerHTML = `<tr><td colspan="4" class="loading-row">No audit logs found.</td></tr>`;
+      return;
+    }
+
+    const actionType = (a) => {
+      if (a.includes("DELETE")) return "danger";
+      if (a.includes("SENT"))   return "success";
+      if (a.includes("LOGIN"))  return "info";
+      return "warning";
+    };
+
+    data.forEach(log => {
+      const date = new Date(log.created_at).toLocaleString();
+      const tr   = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="color:var(--text-muted);font-size:12px">${date}</td>
+        <td><span class="audit-action ${actionType(log.action)}">${log.action}</span></td>
+        <td style="font-size:13px">${log.details || "—"}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${log.user_email || "—"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("Error loading audit logs:", err);
     tbody.innerHTML = `<tr><td colspan="4" class="loading-row">No audit logs found.</td></tr>`;
-    return;
   }
-
-  const actionType = (a) => {
-    if (a.includes("DELETE")) return "danger";
-    if (a.includes("SENT"))   return "success";
-    if (a.includes("LOGIN"))  return "info";
-    return "warning";
-  };
-
-  data.forEach(log => {
-    const date = new Date(log.created_at).toLocaleString();
-    const tr   = document.createElement("tr");
-    tr.innerHTML = `
-      <td style="color:var(--text-muted);font-size:12px">${date}</td>
-      <td><span class="audit-action ${actionType(log.action)}">${log.action}</span></td>
-      <td style="font-size:13px">${log.details || "—"}</td>
-      <td style="font-size:12px;color:var(--text-muted)">${log.user_email || "—"}</td>
-    `;
-    tbody.appendChild(tr);
-  });
 }
 
 /* =====================================================
@@ -978,4 +1013,85 @@ document.addEventListener("DOMContentLoaded", () => {
   /* Apply saved portal settings */
   const savedPortal = JSON.parse(localStorage.getItem("ic3_portal") || "{}");
   if (savedPortal.darkMode) document.body.classList.add("dark-mode");
+
+  /* ── Notification Bell Dropdown ── */
+  const notifBtn = document.getElementById("notif-btn");
+  const notifDropdown = document.getElementById("notif-dropdown");
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notifDropdown.style.display = notifDropdown.style.display === "none" ? "block" : "none";
+    });
+    document.addEventListener("click", (e) => {
+      if (!notifDropdown.contains(e.target) && e.target !== notifBtn) {
+        notifDropdown.style.display = "none";
+      }
+    });
+  }
+
+  /* ── User Profile Click & Update ── */
+  const topbarUser = document.querySelector(".topbar-user");
+  const sidebarUser = document.querySelector(".sidebar-user");
+  const profileOverlay = document.getElementById("profile-modal-overlay");
+  const profileClose = document.getElementById("profile-modal-close");
+  const profileForm = document.getElementById("profile-form");
+
+  const openProfileModal = async () => {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user) {
+      document.getElementById("profile-email").value = user.email;
+      document.getElementById("profile-new-password").value = "";
+      profileOverlay.style.display = "flex";
+    } else if (currentUserEmail) {
+      document.getElementById("profile-email").value = currentUserEmail;
+      document.getElementById("profile-new-password").value = "";
+      profileOverlay.style.display = "flex";
+    } else {
+      showToast("No active user session found.", "error");
+    }
+  };
+
+  if (topbarUser) topbarUser.addEventListener("click", openProfileModal);
+  if (sidebarUser) {
+    // Click on sidebar user container (excluding the logout button inside it)
+    sidebarUser.addEventListener("click", (e) => {
+      if (!e.target.closest("#logout-btn")) {
+        openProfileModal();
+      }
+    });
+  }
+
+  if (profileClose) {
+    profileClose.addEventListener("click", () => {
+      profileOverlay.style.display = "none";
+    });
+  }
+
+  if (profileOverlay) {
+    profileOverlay.addEventListener("click", (e) => {
+      if (e.target === profileOverlay) {
+        profileOverlay.style.display = "none";
+      }
+    });
+  }
+
+  if (profileForm) {
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById("profile-new-password").value;
+      if (newPassword.length < 6) {
+        showToast("Password must be at least 6 characters.", "error");
+        return;
+      }
+      showToast("Updating password...", "info");
+      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      if (error) {
+        showToast("Error updating password: " + error.message, "error");
+      } else {
+        showToast("Password updated successfully!", "success");
+        profileOverlay.style.display = "none";
+        logAudit("PROFILE_UPDATED", "Admin updated account password.");
+      }
+    });
+  }
 });

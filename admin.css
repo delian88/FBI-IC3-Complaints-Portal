@@ -1148,11 +1148,89 @@ body.dark-mode {
 .icon-btn:hover { transform: rotate(-8deg) scale(1.08); }
 
 /* --- Search box focus glow --- */
-.search-box {
-  transition: border-color .2s, box-shadow .2s;
-}
-
 .search-box:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(108,99,255,.12);
 }
+
+/* --- Sticky Topbar --- */
+.topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 150 !important;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+/* --- Table Responsiveness --- */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrapper table {
+  min-width: 850px;
+}
+
+/* --- Notification Dropdown --- */
+.notif-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  width: 320px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 200;
+  overflow: hidden;
+  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.notif-header {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.notif-list {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-item:hover {
+  background: var(--bg);
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.notif-time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Dark mode adjustment for dropdowns */
+body.dark-mode .notif-dropdown {
+  background: var(--card-bg);
+  border-color: var(--border);
+}
+
