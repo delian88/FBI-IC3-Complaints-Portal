@@ -127,8 +127,14 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
+    let message = error.message;
+    if (message.includes("Authentication failed") || message.includes("Username and Password not accepted")) {
+      message = "SMTP Authentication Failed: Please verify your SMTP username/email and App Password in Settings.";
+    } else if (message.includes("connection closed") || message.includes("Failed to connect") || message.includes("getaddrinfo")) {
+      message = "SMTP Connection Failed: Could not reach the SMTP server. Please verify your SMTP host and port in Settings.";
+    }
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   }
