@@ -18,6 +18,7 @@ serve(async (req) => {
 
     // Verify authentication
     const authHeader = req.headers.get('Authorization')!;
+    const token = authHeader ? authHeader.replace('Bearer ', '') : '';
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -26,7 +27,7 @@ serve(async (req) => {
 
     // If it's bulk or custom recipients list, ensure user is authenticated
     if (bulk || toEmails || smtpSettings) {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { user } } = await supabaseClient.auth.getUser(token);
       if (!user) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
