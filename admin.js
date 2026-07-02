@@ -13,6 +13,20 @@ let currentPage    = 1;
 const PAGE_SIZE    = 10;
 let customEmailTags = [];
 let currentUserEmail = "";
+let dashboardFiles = [];
+let ecFiles = [];
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
 
 /* =====================================================
    TOAST
@@ -378,7 +392,7 @@ function renderTags() {
 /* =====================================================
    SEND EMAIL (shared)
    ===================================================== */
-async function sendEmail(subject, htmlBody, targetEmails) {
+async function sendEmail(subject, htmlBody, targetEmails, attachments) {
   const smtpSettings = getSMTPSettings();
 
   if (!smtpSettings.enabled) {
@@ -387,7 +401,7 @@ async function sendEmail(subject, htmlBody, targetEmails) {
   }
 
   const { error } = await supabaseClient.functions.invoke("send-email", {
-    body: { subject, htmlBody, toEmails: targetEmails, smtpSettings }
+    body: { subject, htmlBody, toEmails: targetEmails, smtpSettings, attachments }
   });
 
   if (error) {
@@ -687,6 +701,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.id === "modal-overlay") document.getElementById("modal-overlay").style.display = "none";
   });
 
+  // Dashboard attachment input change
+  const dashAttachInput = document.getElementById("dashboard-attachment-input");
+  const dashAttachList = document.getElementById("dashboard-attachment-list");
+  if (dashAttachInput) {
+    dashAttachInput.addEventListener("change", () => {
+      dashboardFiles = Array.from(dashAttachInput.files);
+      if (dashboardFiles.length > 0) {
+        dashAttachList.textContent = `${dashboardFiles.length} file(s) selected`;
+      } else {
+        dashAttachList.textContent = "";
+      }
+    });
+  }
+
   /* ── Dashboard send email ── */
   document.getElementById("send-email-btn").addEventListener("click", async () => {
     const subject = document.getElementById("email-subject").value.trim();
@@ -703,10 +731,36 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl.style.color = "orange"; statusEl.textContent = "Sending...";
     showToast("Sending emails...", "info");
 
-    const ok = await sendEmail(subject, htmlBody, emails);
-    if (ok) { statusEl.style.color = "green"; statusEl.textContent = "Sent successfully!"; }
-    else { statusEl.style.color = "red"; statusEl.textContent = "Failed. Check Settings → SMTP."; }
-    document.getElementById("send-email-btn").disabled = false;
+    try {
+      // Convert attachments to base64
+      const attachments = await Promise.all(
+        dashboardFiles.map(async (file) => {
+          const content = await fileToBase64(file);
+          return {
+            filename: file.name,
+            contentType: file.type,
+            content: content
+          };
+        })
+      );
+
+      const ok = await sendEmail(subject, htmlBody, emails, attachments);
+      if (ok) {
+        statusEl.style.color = "green"; statusEl.textContent = "Sent successfully!";
+        document.getElementById("email-subject").value = "";
+        document.getElementById("email-body").innerHTML = "";
+        dashboardFiles = [];
+        if (dashAttachInput) dashAttachInput.value = "";
+        if (dashAttachList) dashAttachList.textContent = "";
+      } else {
+        statusEl.style.color = "red"; statusEl.textContent = "Failed. Check Settings → SMTP.";
+      }
+    } catch (err) {
+      statusEl.style.color = "red"; statusEl.textContent = "Error preparing attachments: " + err.message;
+      showToast("Error preparing attachments: " + err.message, "error");
+    } finally {
+      document.getElementById("send-email-btn").disabled = false;
+    }
   });
 
   /* ── Dashboard word count ── */
@@ -796,6 +850,20 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("recip-tags").value  = "";
   });
 
+  // Email Center attachment input change
+  const ecAttachInput = document.getElementById("ec-attachment-input");
+  const ecAttachList = document.getElementById("ec-attachment-list");
+  if (ecAttachInput) {
+    ecAttachInput.addEventListener("change", () => {
+      ecFiles = Array.from(ecAttachInput.files);
+      if (ecFiles.length > 0) {
+        ecAttachList.textContent = `${ecFiles.length} file(s) selected`;
+      } else {
+        ecAttachList.textContent = "";
+      }
+    });
+  }
+
   /* ── Email Center send ── */
   document.getElementById("ec-send-btn").addEventListener("click", async () => {
     const subject  = document.getElementById("ec-subject").value.trim();
@@ -813,16 +881,37 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl.style.color = "orange"; statusEl.textContent = `Sending to ${emails.length} recipients...`;
     showToast(`Sending to ${emails.length} recipients...`, "info");
 
-    const ok = await sendEmail(subject, htmlBody, emails);
-    if (ok) {
-      statusEl.style.color = "green"; statusEl.textContent = `Sent to ${emails.length} recipients!`;
-      document.getElementById("ec-subject").value = "";
-      document.getElementById("ec-body").innerHTML = "";
-      customEmailTags = []; renderTags();
-    } else {
-      statusEl.style.color = "red"; statusEl.textContent = "Send failed. Check Settings → SMTP.";
+    try {
+      // Convert attachments to base64
+      const attachments = await Promise.all(
+        ecFiles.map(async (file) => {
+          const content = await fileToBase64(file);
+          return {
+            filename: file.name,
+            contentType: file.type,
+            content: content
+          };
+        })
+      );
+
+      const ok = await sendEmail(subject, htmlBody, emails, attachments);
+      if (ok) {
+        statusEl.style.color = "green"; statusEl.textContent = `Sent to ${emails.length} recipients!`;
+        document.getElementById("ec-subject").value = "";
+        document.getElementById("ec-body").innerHTML = "";
+        customEmailTags = []; renderTags();
+        ecFiles = [];
+        if (ecAttachInput) ecAttachInput.value = "";
+        if (ecAttachList) ecAttachList.textContent = "";
+      } else {
+        statusEl.style.color = "red"; statusEl.textContent = "Send failed. Check Settings → SMTP.";
+      }
+    } catch (err) {
+      statusEl.style.color = "red"; statusEl.textContent = "Error preparing attachments: " + err.message;
+      showToast("Error preparing attachments: " + err.message, "error");
+    } finally {
+      document.getElementById("ec-send-btn").disabled = false;
     }
-    document.getElementById("ec-send-btn").disabled = false;
   });
 
   /* EC word count */

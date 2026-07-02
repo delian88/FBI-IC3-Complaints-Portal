@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { SmtpClient } from "https://deno.land/x/smtp/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { decode } from "https://deno.land/std@0.177.0/encoding/base64.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,13 +9,12 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { subject, htmlBody, toEmail, bulk } = await req.json();
+    const { subject, htmlBody, toEmail, toEmails, bulk, smtpSettings, attachments } = await req.json();
 
     // Verify authentication
     const authHeader = req.headers.get('Authorization')!;
@@ -24,8 +24,8 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // If it's a bulk email, ensure the user is an admin (authenticated)
-    if (bulk) {
+    // If it's bulk or custom recipients list, ensure user is authenticated
+    if (bulk || toEmails || smtpSettings) {
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -35,44 +35,88 @@ serve(async (req) => {
       }
     }
 
+    // Determine SMTP configuration (dynamic settings from client OR fallback to Env vars)
+    const isDynamic = smtpSettings && smtpSettings.enabled;
+    const hostname = isDynamic ? smtpSettings.host : "smtp.gmail.com";
+    const port = isDynamic ? parseInt(smtpSettings.port) : 465;
+    const username = isDynamic ? smtpSettings.user : (Deno.env.get('SMTP_EMAIL') ?? '');
+    const password = isDynamic ? smtpSettings.pass : (Deno.env.get('SMTP_PASSWORD') ?? '');
+    const fromName = isDynamic ? smtpSettings.fromName : "IC3 Complaints Team";
+    const fromEmail = isDynamic ? smtpSettings.fromEmail : username;
+
+    if (!username || !password) {
+      throw new Error("SMTP credentials are not configured.");
+    }
+
     const smtpClient = new SmtpClient();
     
-    // Connect to Google Workspace SMTP
-    await smtpClient.connectTLS({
-      hostname: "smtp.gmail.com",
-      port: 465,
-      username: Deno.env.get('SMTP_EMAIL') ?? '',
-      password: Deno.env.get('SMTP_PASSWORD') ?? '',
-    });
+    // Connect
+    if (port === 465) {
+      await smtpClient.connectTLS({ hostname, port, username, password });
+    } else {
+      await smtpClient.connect({ hostname, port, username, password });
+    }
 
+    // Process attachments
+    const formattedAttachments = [];
+    if (attachments && Array.isArray(attachments)) {
+      for (const att of attachments) {
+        if (att.filename && att.content) {
+          formattedAttachments.push({
+            filename: att.filename,
+            content: decode(att.content),
+            contentType: att.contentType || "application/octet-stream"
+          });
+        }
+      }
+    }
+
+    const senderIdentity = fromName ? `"${fromName}" <${fromEmail}>` : fromEmail;
+
+    // Send emails
     if (bulk) {
-      // Fetch all complainants
+      // Send to all complainants
       const { data: complaints, error } = await supabaseClient
         .from('complaints')
         .select('email, fullname');
 
       if (error) throw error;
 
-      // Send email to each (batching might be needed for very large lists, but doing a loop for now)
       for (const complainant of complaints) {
         if (complainant.email) {
           await smtpClient.send({
-            from: Deno.env.get('SMTP_EMAIL') ?? '',
+            from: senderIdentity,
             to: complainant.email,
             subject: subject,
             content: "text/html",
             html: htmlBody.replace("{{name}}", complainant.fullname || "User"),
+            attachments: formattedAttachments,
+          });
+        }
+      }
+    } else if (toEmails && Array.isArray(toEmails)) {
+      // Send to specified array of emails
+      for (const email of toEmails) {
+        if (email) {
+          await smtpClient.send({
+            from: senderIdentity,
+            to: email,
+            subject: subject,
+            content: "text/html",
+            html: htmlBody,
+            attachments: formattedAttachments,
           });
         }
       }
     } else if (toEmail) {
-      // Send single confirmation email
+      // Single recipient fallback
       await smtpClient.send({
-        from: Deno.env.get('SMTP_EMAIL') ?? '',
+        from: senderIdentity,
         to: toEmail,
         subject: subject,
         content: "text/html",
         html: htmlBody,
+        attachments: formattedAttachments,
       });
     }
 

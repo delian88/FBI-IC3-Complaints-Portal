@@ -206,7 +206,14 @@
               <button type="button" onclick="document.execCommand('justifyRight')"><i class="fa fa-align-right"></i></button>
             </div>
             <div id="email-body" class="email-editor" contenteditable="true" data-placeholder="Write your email here... (HTML supported)"></div>
-            <div class="editor-footer">
+            <div class="editor-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div class="attachment-input-wrapper" style="display:flex; align-items:center; gap:10px;">
+                <label for="dashboard-attachment-input" class="btn-outline" style="padding:6px 12px; font-size:12px; cursor:pointer;">
+                  <i class="fa fa-paperclip"></i> Attach File
+                </label>
+                <input type="file" id="dashboard-attachment-input" style="display:none" multiple>
+                <span id="dashboard-attachment-list" style="font-size:12px; color:var(--text-muted);"></span>
+              </div>
               <span id="word-count">Words: 0</span>
             </div>
           </div>
@@ -356,7 +363,16 @@
               <button type="button" onclick="document.execCommand('justifyRight')"><i class="fa fa-align-right"></i></button>
             </div>
             <div id="ec-body" class="email-editor" contenteditable="true" data-placeholder="Write your email here..."></div>
-            <div class="editor-footer"><span id="ec-word-count">Words: 0</span></div>
+            <div class="editor-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div class="attachment-input-wrapper" style="display:flex; align-items:center; gap:10px;">
+                <label for="ec-attachment-input" class="btn-outline" style="padding:6px 12px; font-size:12px; cursor:pointer;">
+                  <i class="fa fa-paperclip"></i> Attach File
+                </label>
+                <input type="file" id="ec-attachment-input" style="display:none" multiple>
+                <span id="ec-attachment-list" style="font-size:12px; color:var(--text-muted);"></span>
+              </div>
+              <span id="ec-word-count">Words: 0</span>
+            </div>
             <div id="ec-status" style="padding:0 24px 14px;font-size:13px"></div>
           </div>
 
