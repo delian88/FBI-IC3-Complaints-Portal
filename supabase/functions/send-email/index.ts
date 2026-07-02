@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { SmtpClient } from "https://deno.land/x/smtp/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { decode } from "https://deno.land/std@0.177.0/encoding/base64.ts";
+import nodemailer from "npm:nodemailer";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,7 +35,7 @@ serve(async (req) => {
       }
     }
 
-    // Determine SMTP configuration (dynamic settings from client OR fallback to Env vars)
+    // Determine SMTP configuration
     const isDynamic = smtpSettings && smtpSettings.enabled;
     const hostname = isDynamic ? smtpSettings.host : "smtp.gmail.com";
     const port = isDynamic ? parseInt(smtpSettings.port) : 465;
@@ -49,14 +48,16 @@ serve(async (req) => {
       throw new Error("SMTP credentials are not configured.");
     }
 
-    const smtpClient = new SmtpClient();
-    
-    // Connect
-    if (port === 465) {
-      await smtpClient.connectTLS({ hostname, port, username, password });
-    } else {
-      await smtpClient.connect({ hostname, port, username, password });
-    }
+    // Create Nodemailer Transporter
+    const transporter = nodemailer.createTransport({
+      host: hostname,
+      port: port,
+      secure: port === 465,
+      auth: {
+        user: username,
+        pass: password,
+      },
+    });
 
     // Process attachments
     const formattedAttachments = [];
@@ -65,7 +66,8 @@ serve(async (req) => {
         if (att.filename && att.content) {
           formattedAttachments.push({
             filename: att.filename,
-            content: decode(att.content),
+            content: att.content,
+            encoding: 'base64',
             contentType: att.contentType || "application/octet-stream"
           });
         }
@@ -74,7 +76,17 @@ serve(async (req) => {
 
     const senderIdentity = fromName ? `"${fromName}" <${fromEmail}>` : fromEmail;
 
-    // Send emails
+    // Send emails helper
+    const sendMailPromise = (to, htmlContent) => {
+      return transporter.sendMail({
+        from: senderIdentity,
+        to: to,
+        subject: subject,
+        html: htmlContent,
+        attachments: formattedAttachments,
+      });
+    };
+
     if (bulk) {
       // Send to all complainants
       const { data: complaints, error } = await supabaseClient
@@ -85,43 +97,20 @@ serve(async (req) => {
 
       for (const complainant of complaints) {
         if (complainant.email) {
-          await smtpClient.send({
-            from: senderIdentity,
-            to: complainant.email,
-            subject: subject,
-            content: "text/html",
-            html: htmlBody.replace("{{name}}", complainant.fullname || "User"),
-            attachments: formattedAttachments,
-          });
+          await sendMailPromise(complainant.email, htmlBody.replace("{{name}}", complainant.fullname || "User"));
         }
       }
     } else if (toEmails && Array.isArray(toEmails)) {
       // Send to specified array of emails
       for (const email of toEmails) {
         if (email) {
-          await smtpClient.send({
-            from: senderIdentity,
-            to: email,
-            subject: subject,
-            content: "text/html",
-            html: htmlBody,
-            attachments: formattedAttachments,
-          });
+          await sendMailPromise(email, htmlBody);
         }
       }
     } else if (toEmail) {
       // Single recipient fallback
-      await smtpClient.send({
-        from: senderIdentity,
-        to: toEmail,
-        subject: subject,
-        content: "text/html",
-        html: htmlBody,
-        attachments: formattedAttachments,
-      });
+      await sendMailPromise(toEmail, htmlBody);
     }
-
-    await smtpClient.close();
 
     return new Response(
       JSON.stringify({ success: true }),
