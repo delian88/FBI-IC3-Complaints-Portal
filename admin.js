@@ -604,7 +604,7 @@ async function loadAuditLogs() {
       .from("audit_logs").select("*").order("created_at", { ascending: false }).limit(100);
 
     if (error || !data || !data.length) {
-      tbody.innerHTML = `<tr><td colspan="4" class="loading-row">No audit logs found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">No audit logs found.</td></tr>`;
       return;
     }
 

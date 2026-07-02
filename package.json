@@ -17,5 +17,8 @@
     "url": "https://github.com/delian88/FBI-IC3-Complaints-Portal/issues"
   },
   "homepage": "https://github.com/delian88/FBI-IC3-Complaints-Portal#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "pg": "^8.22.0"
+  }
 }
