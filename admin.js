@@ -1027,12 +1027,116 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedPortal.darkMode) document.body.classList.add("dark-mode");
 
   /* ── Notification Bell Dropdown ── */
-  const notifBtn = document.getElementById("notif-btn");
+  const notifBtn      = document.getElementById("notif-btn");
   const notifDropdown = document.getElementById("notif-dropdown");
+  const notifBadge    = document.getElementById("notif-badge");
+  const notifList     = document.getElementById("notif-list");
+  const markAllBtn    = document.getElementById("mark-all-read-btn");
+
+  let allNotifications = [];
+
+  function getReadIds() {
+    return JSON.parse(localStorage.getItem("ic3_read_notifs") || "[]");
+  }
+
+  function saveReadId(id) {
+    const ids = getReadIds();
+    if (!ids.includes(id)) { ids.push(id); localStorage.setItem("ic3_read_notifs", JSON.stringify(ids)); }
+  }
+
+  function saveAllReadIds(ids) {
+    const existing = getReadIds();
+    const merged = [...new Set([...existing, ...ids])];
+    localStorage.setItem("ic3_read_notifs", JSON.stringify(merged));
+  }
+
+  function updateBadge() {
+    const readIds = getReadIds();
+    const unreadCount = allNotifications.filter(n => !readIds.includes(n.id)).length;
+    if (unreadCount > 0) {
+      notifBadge.textContent = unreadCount > 99 ? "99+" : unreadCount;
+      notifBadge.style.display = "";
+    } else {
+      notifBadge.style.display = "none";
+    }
+  }
+
+  function timeAgo(dateStr) {
+    const diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 60)   return "Just now";
+    if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+    return Math.floor(diff / 86400) + "d ago";
+  }
+
+  function actionLabel(action) {
+    const map = {
+      LOGIN:           "Admin logged in",
+      LOGOUT:          "Admin logged out",
+      BULK_EMAIL_SENT: "Bulk email sent",
+      SMTP_UPDATED:    "SMTP settings updated",
+      PROFILE_UPDATED: "Profile password updated",
+      SMTP_TEST:       "Test email sent",
+    };
+    return map[action] || action.replace(/_/g, " ");
+  }
+
+  function renderNotifications() {
+    const readIds = getReadIds();
+    notifList.innerHTML = "";
+
+    if (!allNotifications.length) {
+      notifList.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No notifications yet</div>`;
+      return;
+    }
+
+    allNotifications.slice(0, 15).forEach(n => {
+      const isRead = readIds.includes(n.id);
+      const div = document.createElement("div");
+      div.className = `notif-item ${isRead ? "read" : "unread"}`;
+      div.innerHTML = `
+        <div class="notif-dot"></div>
+        <div class="notif-content">
+          <div class="notif-title">${actionLabel(n.action)}</div>
+          <div class="notif-time">${timeAgo(n.created_at)}${n.details ? " · " + n.details : ""}</div>
+        </div>`;
+      div.addEventListener("click", () => {
+        saveReadId(n.id);
+        div.classList.replace("unread", "read");
+        div.querySelector(".notif-dot").style.background = "transparent";
+        div.querySelector(".notif-dot").style.border = "1px solid var(--border)";
+        div.querySelector(".notif-title").style.fontWeight = "400";
+        div.querySelector(".notif-title").style.color = "var(--text-muted)";
+        updateBadge();
+      });
+      notifList.appendChild(div);
+    });
+
+    updateBadge();
+  }
+
+  async function loadNotifications() {
+    try {
+      const { data, error } = await supabaseClient
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      allNotifications = data || [];
+    } catch (err) {
+      console.error("Notifications load error:", err);
+      allNotifications = [];
+    }
+    renderNotifications();
+  }
+
   if (notifBtn && notifDropdown) {
     notifBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      notifDropdown.style.display = notifDropdown.style.display === "none" ? "block" : "none";
+      const isOpen = notifDropdown.style.display !== "none";
+      notifDropdown.style.display = isOpen ? "none" : "block";
+      if (!isOpen) { loadNotifications(); }
     });
     document.addEventListener("click", (e) => {
       if (!notifDropdown.contains(e.target) && e.target !== notifBtn) {
@@ -1040,6 +1144,22 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  if (markAllBtn) {
+    markAllBtn.addEventListener("click", () => {
+      saveAllReadIds(allNotifications.map(n => n.id));
+      renderNotifications();
+    });
+  }
+
+  // Initial badge load on page load
+  (async () => {
+    try {
+      const { data } = await supabaseClient.from("audit_logs").select("id, action, created_at").order("created_at", { ascending: false }).limit(20);
+      allNotifications = data || [];
+      updateBadge();
+    } catch (e) { notifBadge.style.display = "none"; }
+  })();
 
   /* ── User Profile Click & Update ── */
   const topbarUser = document.querySelector(".topbar-user");
