@@ -188,6 +188,22 @@ body {
     margin-left: 0 !important;
     width: 100% !important;
   }
+  .topbar {
+    padding: 0 12px !important;
+  }
+  .topbar .search-box {
+    display: none !important;
+  }
+  .topbar-user div,
+  .topbar-user i.fa-chevron-down {
+    display: none !important;
+  }
+  .topbar-user {
+    padding: 4px !important;
+  }
+  .page-title {
+    font-size: 15px !important;
+  }
 }
 
 @media (min-width: 769px) {
