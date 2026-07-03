@@ -211,11 +211,25 @@ body {
   .page-title {
     font-size: 15px !important;
   }
+  .sidebar-close-btn {
+    display: flex !important;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    align-items: center;
+    margin-right: 8px;
+  }
 }
 
 @media (min-width: 769px) {
   .hamburger { display: none; }
   .sidebar-overlay { display: none !important; }
+}
+
+.sidebar-close-btn {
+  display: none;
 }
 
 .sidebar-logo {

@@ -745,6 +745,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("sidebar-overlay").classList.remove("active");
   });
 
+  const sidebarClose = document.getElementById("sidebar-close-btn");
+  if (sidebarClose) {
+    sidebarClose.addEventListener("click", () => {
+      sidebar.classList.remove("mobile-open");
+      document.getElementById("sidebar-overlay").classList.remove("active");
+    });
+  }
+
   /* ── Dark mode ── */
   document.getElementById("dark-mode-btn").addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
