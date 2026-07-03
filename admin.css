@@ -183,7 +183,14 @@ body {
     transform: translateX(0);
   }
   .sidebar .collapse-btn { display: none; }
-  .hamburger { display: flex !important; }
+  .hamburger {
+    display: flex !important;
+    z-index: 150 !important;
+    position: relative !important;
+  }
+  .sidebar.mobile-open ~ .main-wrapper .hamburger {
+    color: #fff !important;
+  }
   .main-wrapper {
     margin-left: 0 !important;
     width: 100% !important;
