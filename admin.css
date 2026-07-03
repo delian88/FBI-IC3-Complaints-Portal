@@ -172,69 +172,86 @@ body {
 }
 .sidebar-overlay.active { display: block; }
 
+/* ── Mobile sidebar ── */
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform .28s ease, width .25s ease;
-    z-index: 250 !important;
-    width: var(--sidebar-width) !important;
+  /* Topbar must always be on top so hamburger is always clickable */
+  .topbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 500 !important;
+    padding: 0 12px !important;
   }
-  .sidebar.mobile-open {
-    transform: translateX(0);
-  }
-  .sidebar-overlay {
-    z-index: 240 !important;
-  }
-  .sidebar-overlay.active {
-    display: block !important;
-  }
-  .sidebar .collapse-btn { display: none; }
-  .hamburger {
-    display: flex !important;
-  }
+
+  /* Push content down so it's not hidden behind fixed topbar */
   .main-wrapper {
     margin-left: 0 !important;
     width: 100% !important;
+    padding-top: var(--topbar-h) !important;
   }
+
+  /* Sidebar starts below the topbar so hamburger is never covered */
+  .sidebar {
+    top: var(--topbar-h) !important;
+    height: calc(100vh - var(--topbar-h)) !important;
+    transform: translateX(-100%) !important;
+    transition: transform .3s ease !important;
+    z-index: 400 !important;
+    width: var(--sidebar-width) !important;
+    animation: none !important;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  /* Overlay: covers content area only (not topbar) */
+  .sidebar-overlay {
+    top: var(--topbar-h) !important;
+    z-index: 399 !important;
+  }
+
+  .sidebar-overlay.active {
+    display: block !important;
+  }
+
+  .sidebar .collapse-btn { display: none !important; }
+  .sidebar-close-btn { display: none !important; }
+
+  .hamburger { display: flex !important; }
+
+  /* Topbar right items - hide on very small screens */
+  .topbar .search-box { display: none !important; }
+  .topbar-user .tb-name,
+  .topbar-user .tb-role,
+  .topbar-user i.fa-chevron-down { display: none !important; }
+
+  .page-title { font-size: 15px !important; }
+
+  /* Notification dropdown: full width on mobile */
   .notif-dropdown {
     position: fixed !important;
     top: var(--topbar-h) !important;
-    right: 12px !important;
-    width: calc(100vw - 24px) !important;
-    max-width: 340px !important;
-    z-index: 300 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    z-index: 600 !important;
   }
-  .topbar {
-    padding: 0 12px !important;
-  }
-  .topbar .search-box {
-    display: none !important;
-  }
-  .topbar-user div,
-  .topbar-user i.fa-chevron-down {
-    display: none !important;
-  }
-  .topbar-user {
-    padding: 4px !important;
-  }
-  .page-title {
-    font-size: 15px !important;
-  }
-  .sidebar-close-btn {
-    display: flex !important;
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 18px;
-    align-items: center;
-    margin-right: 8px;
-  }
+
+  /* Grid layouts on mobile */
+  .stat-grid { grid-template-columns: 1fr !important; }
+  .reports-grid { grid-template-columns: 1fr !important; }
+  .settings-grid { grid-template-columns: 1fr !important; }
+  .email-center-grid { grid-template-columns: 1fr !important; }
 }
 
 @media (min-width: 769px) {
-  .hamburger { display: none; }
+  .hamburger { display: none !important; }
   .sidebar-overlay { display: none !important; }
+  .sidebar-close-btn { display: none !important; }
 }
 
 .sidebar-close-btn {
@@ -827,11 +844,8 @@ body.dark-mode {
   .email-center-grid { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 768px) {
-  .stat-grid { grid-template-columns: 1fr !important; }
-  .reports-grid { grid-template-columns: 1fr !important; }
-  .settings-grid { grid-template-columns: 1fr !important; }
-}
+
+
 
 /* ===================== PAGE HEADERS ===================== */
 .page-header {
@@ -1230,9 +1244,9 @@ body.dark-mode {
 
 /* --- Sticky Topbar --- */
 .topbar {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 150 !important;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   background: var(--card-bg);
   box-shadow: var(--shadow);
 }
