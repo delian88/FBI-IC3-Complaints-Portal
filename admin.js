@@ -718,6 +718,11 @@ document.addEventListener("DOMContentLoaded", () => {
     item.addEventListener("click", (e) => {
       e.preventDefault();
       switchPage(item.dataset.page);
+      // Close sidebar on mobile after nav tap
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove("mobile-open");
+        document.getElementById("sidebar-overlay").classList.remove("active");
+      }
     });
   });
 
@@ -730,7 +735,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("hamburger").addEventListener("click", () => {
-    sidebar.classList.toggle("mobile-open");
+    const isOpen = sidebar.classList.toggle("mobile-open");
+    document.getElementById("sidebar-overlay").classList.toggle("active", isOpen);
+  });
+
+  // Close sidebar when overlay is tapped on mobile
+  document.getElementById("sidebar-overlay").addEventListener("click", () => {
+    sidebar.classList.remove("mobile-open");
+    document.getElementById("sidebar-overlay").classList.remove("active");
   });
 
   /* ── Dark mode ── */
